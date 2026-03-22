@@ -818,7 +818,7 @@ function Overview({ doctor }) {
                     background:"linear-gradient(135deg,#e0f2fe,#bae6fd)",
                     display:"flex", alignItems:"center", justifyContent:"center",
                     fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:14, color:"#0ea5e9",
-                  }}>{(a.patient_name||a.patient||"P")[0].toUpperCase()}</div>
+                  }}>{(String(a.patient_name || a.patient || "P"))[0].toUpperCase()}</div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <p style={{ fontFamily:"'Sora',sans-serif", fontSize:14, fontWeight:700, color:"#0f172a" }}>
                       {a.patient_name||a.patient||"Patient"}
@@ -1357,7 +1357,7 @@ function Appointments() {
                     border:"2px solid #bae6fd",
                     display:"flex", alignItems:"center", justifyContent:"center",
                     fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:16, color:"#0ea5e9",
-                  }}>{(a.patient_name||a.patient||"P")[0].toUpperCase()}</div>
+                  }}>{(String(a.patient_name || a.patient || "P"))[0].toUpperCase()}</div>
 
                   {/* Info */}
                   <div style={{ flex:1, minWidth:160 }}>

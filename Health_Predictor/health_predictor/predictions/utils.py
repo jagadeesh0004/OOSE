@@ -4,7 +4,7 @@ import numpy as np
 import os
 from django.conf import settings
 
-MODEL_PATH = "C:\\Users\\tejut\\OneDrive\\Desktop\\OOSE_PROJECT\\predictor_project\\Models\\health_risk_pipeline.pkl"
+MODEL_PATH = "C:\\Users\\18080\\OOSE\\HealthRiskML\\model\\health_risk_pipeline.pkl"
 _model = None
 
 def get_model():

@@ -1370,7 +1370,7 @@ export default function PatientDashboard() {
         <main style={{ flex:1, overflowY:"auto", padding:28 }}>
           {page==="overview"     && <Overview     user={user} onNav={setPage}/>}
           {page==="appointments" && <MyAppointments onNav={setPage}/>}
-          {page==="book"         && <BookAppointment/>}
+          {page==="book"         && <BookAppointment onNav={setPage}/>}
           {page==="predict"      && <Prediction onNav={setPage}/>}
           {page==="history"      && <PredictionHistory onNav={setPage}/>}
           {page==="profile"      && <Profile user={user} onUserUpdate={u=>{ setUser(u); localStorage.setItem("user",JSON.stringify(u)); }}/>}
