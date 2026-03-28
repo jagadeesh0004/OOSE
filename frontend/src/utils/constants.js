@@ -1,4 +1,8 @@
-// ==================== ICONS ====================
+// ═══════════════════════════════════════════════════════════════════════════
+// CONSTANTS & ICONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── SVG Icon Paths ────────────────────────────────────────────────────────
 export const IC = {
   grid:     "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z",
   user:     "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z",
@@ -18,93 +22,67 @@ export const IC = {
   filter:   "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z",
   search:   "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
   chevDown: "M19 9l-7 7-7-7",
+  chevron:  "M9 18l6-6-6-6",
   brain:    "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
   history:  "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-  chevron:  "M9 18l6-6-6-6",
   heartbeat:"M3 12h4l3-9 4 18 3-9h4",
 };
 
-// ==================== NAVIGATION ====================
-export const PATIENT_NAV = [
-  { id: "overview",    label: "Overview",           icon: "grid"     },
-  { id: "appointments", label: "My Appointments",    icon: "calendar" },
-  { id: "book",        label: "Book Appointment",   icon: "plus"     },
-  { id: "predict",     label: "Health Prediction",  icon: "brain"    },
-  { id: "history",     label: "Prediction History", icon: "history"  },
-  { id: "profile",     label: "My Profile",         icon: "user"     },
+// ── Schedule ───────────────────────────────────────────────────────────────
+export const DAYS = [
+  "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
 ];
 
-export const DOCTOR_NAV = [
+// ── Appointment status options (doctor dashboard) ──────────────────────────
+export const STATUS_OPTS = ["Pending", "Confirmed", "Completed", "Cancelled"];
+
+// ── Doctor sidebar nav items ───────────────────────────────────────────────
+export const DOCTOR_NAV_ITEMS = [
   { id: "overview",     label: "Overview",     icon: "grid"     },
   { id: "profile",      label: "My Profile",   icon: "user"     },
   { id: "slots",        label: "Manage Slots", icon: "clock"    },
   { id: "appointments", label: "Appointments", icon: "calendar" },
 ];
 
-// ==================== DAYS ====================
-export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-// ==================== LANDING PAGE ====================
-export const NAV_LINKS = ["Features", "How It Works", "For Doctors", "Predictions"];
-
-export const FEATURES = [
-  {
-    icon: "shield",
-    title: "AI Risk Prediction",
-    desc: "Our ML model analyzes 10 health metrics to classify your risk level — low, medium, or high — with personalized prescriptions.",
-    accent: "#0ea5e9",
-  },
-  {
-    icon: "calendar",
-    title: "Smart Appointments",
-    desc: "Book, track, and manage doctor appointments with real-time slot availability and double-booking prevention.",
-    accent: "#8b5cf6",
-  },
-  {
-    icon: "user",
-    title: "Doctor Profiles",
-    desc: "Browse verified doctors by specialization, view availability, and get auto-matched to the right specialist for your risk profile.",
-    accent: "#f43f5e",
-  },
-  {
-    icon: "history",
-    title: "Health History",
-    desc: "Track your prediction history over time, filter by risk level, and monitor health metric trends to make informed decisions.",
-    accent: "#f59e0b",
-  },
+// ── Patient sidebar nav items ──────────────────────────────────────────────
+export const PATIENT_NAV_ITEMS = [
+  { id: "overview",     label: "Overview",           icon: "grid"     },
+  { id: "appointments", label: "My Appointments",    icon: "calendar" },
+  { id: "book",         label: "Book Appointment",   icon: "plus"     },
+  { id: "predict",      label: "Health Prediction",  icon: "brain"    },
+  { id: "history",      label: "Prediction History", icon: "history"  },
+  { id: "profile",      label: "My Profile",         icon: "user"     },
 ];
 
-export const STEPS = [
-  { num: "01", title: "Register & Login",       desc: "Create your patient or doctor account in seconds with token-based auth." },
-  { num: "02", title: "Enter Health Metrics",   desc: "Submit 10 key health indicators — vitals, lifestyle, biometrics." },
-  { num: "03", title: "Get Instant Prediction", desc: "Our ML model calculates your risk score and generates a prescription." },
-  { num: "04", title: "Connect With Doctors",   desc: "High-risk? Get matched to a specialist and book an appointment instantly." },
-];
-
-export const METRICS = [
-  { label: "Patients Served",  value: "24K+",  sub: "and growing"          },
-  { label: "Doctors Onboard",  value: "380+",  sub: "verified specialists"  },
-  { label: "Predictions Made", value: "91K+",  sub: "ML assessments"        },
-  { label: "Accuracy Rate",    value: "94.2%", sub: "model precision"       },
-];
-
-// ==================== STATUS COLORS ====================
-export const STATUS_COLORS = {
-  pending:   { bg: "#fffbeb", fg: "#d97706", bd: "#fde68a", label: "Pending"   },
-  confirmed: { bg: "#f0fdf4", fg: "#16a34a", bd: "#bbf7d0", label: "Confirmed" },
-  completed: { bg: "#eff6ff", fg: "#2563eb", bd: "#bfdbfe", label: "Completed" },
-  cancelled: { bg: "#fff1f2", fg: "#dc2626", bd: "#fecdd3", label: "Cancelled" },
+// ── Status badge map (shared between doctor & patient) ────────────────────
+export const STATUS_BADGE_MAP = {
+  confirmed: { bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0", label: "Confirmed" },
+  completed: { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe", label: "Completed" },
+  cancelled: { bg: "#fff1f2", color: "#dc2626", border: "#fecdd3", label: "Cancelled" },
+  pending:   { bg: "#fffbeb", color: "#d97706", border: "#fde68a", label: "Pending"   },
 };
 
-// ==================== RISK COLORS ====================
-export const RISK_COLORS = {
-  low:    { bg: "#f0fdf4", bd: "#bbf7d0", fg: "#16a34a", icon: "✅", label: "Low Risk"    },
-  medium: { bg: "#fffbeb", bd: "#fde68a", fg: "#d97706", icon: "⚠️", label: "Medium Risk" },
-  high:   { bg: "#fff1f2", bd: "#fecdd3", fg: "#dc2626", icon: "🚨", label: "High Risk"   },
+// ── Risk badge map (patient prediction) ───────────────────────────────────
+export const RISK_BADGE_MAP = {
+  low:    { cls: "risk-low",    icon: "✅", label: "Low Risk"    },
+  medium: { cls: "risk-medium", icon: "⚠️", label: "Medium Risk" },
+  high:   { cls: "risk-high",   icon: "🚨", label: "High Risk"   },
 };
 
-export const GREETING_TIMES = {
-  morning: "morning",
-  afternoon: "afternoon",
-  evening: "evening",
+// ── Risk gradient map (prediction result card) ─────────────────────────────
+export const RISK_GRAD = {
+  low:    "linear-gradient(135deg,#22c55e,#16a34a)",
+  medium: "linear-gradient(135deg,#f59e0b,#d97706)",
+  high:   "linear-gradient(135deg,#ef4444,#dc2626)",
 };
+
+// ── Risk color triples [bg, fg, border] (history list) ────────────────────
+export const RISK_COLOR = {
+  low:    ["#f0fdf4", "#16a34a", "#bbf7d0"],
+  medium: ["#fffbeb", "#d97706", "#fde68a"],
+  high:   ["#fff1f2", "#dc2626", "#fecdd3"],
+};
+
+// ── App branding ───────────────────────────────────────────────────────────
+export const APP_NAME = "HealthPredictor";
+export const DASHBOARD_BG = "linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)";

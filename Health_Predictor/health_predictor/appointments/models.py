@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from datetime import datetime
 from doctors.models import TimeSlot
 
 User = get_user_model()
@@ -37,3 +39,16 @@ class Appointment(models.Model):
     @property
     def appointment_time(self):
         return f"{self.time_slot.start_time} - {self.time_slot.end_time}"
+    
+    @property
+    def is_expired(self):
+        """Check if appointment time has passed"""
+        now = timezone.now()
+        appointment_end = datetime.combine(self.time_slot.date, self.time_slot.end_time)
+        appointment_end_tz = timezone.make_aware(appointment_end) if timezone.is_naive(appointment_end) else appointment_end
+        return now > appointment_end_tz
+    
+    @property
+    def can_be_marked_completed(self):
+        """Doctor can only mark as completed if time has passed"""
+        return self.is_expired and self.status != 'completed' and self.status != 'cancelled'

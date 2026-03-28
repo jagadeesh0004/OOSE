@@ -1,8 +1,16 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// API SERVICE LAYER
+// Central authenticated fetch wrapper — used by all dashboards.
+// Token is read from localStorage on every call (always fresh).
+// On 401 → clears auth and reloads.
+// ═══════════════════════════════════════════════════════════════════════════
+
 const BASE = "/api";
 
 export async function api(path, opts = {}) {
   const token = localStorage.getItem("token");
   const method = opts.method || "GET";
+
   const res = await fetch(`${BASE}${path}`, {
     method,
     headers: {
@@ -12,67 +20,68 @@ export async function api(path, opts = {}) {
     },
     ...(opts.body !== undefined ? { body: JSON.stringify(opts.body) } : {}),
   });
-  
+
   if (res.status === 204) return {};
+
   const data = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     if (res.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.reload();
     }
-    throw new Error(Object.values(data).flat().find(v => typeof v === "string") || data.error || data.detail || `HTTP ${res.status}`);
+    throw new Error(
+      Object.values(data).flat().find((v) => typeof v === "string") ||
+        data.error ||
+        data.detail ||
+        `HTTP ${res.status}`
+    );
   }
-  
+
   return data;
 }
 
-export async function login(username, password) {
-  const res = await fetch(`${BASE}/accounts/login/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  
-  let data = {};
-  const contentType = res.headers.get("content-type");
-  if (contentType?.includes("application/json")) {
-    data = await res.json();
-  }
-  
-  if (!res.ok) {
-    throw new Error(data.non_field_errors?.[0] || "Invalid credentials. Please try again.");
-  }
-  
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-  return data.user;
-}
+// ── Auth ──────────────────────────────────────────────────────────────────
+export const authApi = {
+  login: (body) => api("/accounts/login/", { method: "POST", body }),
+  register: (body) => api("/accounts/register/", { method: "POST", body }),
+  logout: () => api("/accounts/logout/", { method: "POST" }),
+  getProfile: () => api("/accounts/profile/"),
+  updateProfile: (body) => api("/accounts/profile/", { method: "PUT", body }),
+};
 
-export async function register(formData, userType) {
-  const res = await fetch(`${BASE}/accounts/register/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...formData, user_type: userType }),
-  });
-  
-  let data = {};
-  const contentType = res.headers.get("content-type");
-  if (contentType?.includes("application/json")) {
-    data = await res.json();
-  }
-  
-  if (!res.ok) {
-    throw new Error(Object.values(data).flat()[0] || "Registration failed. Please try again.");
-  }
-  
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-  return data.user;
-}
+// ── Doctor ────────────────────────────────────────────────────────────────
+export const doctorApi = {
+  checkProfile: () => api("/doctors/check-profile/"),
+  getMyProfile: () => api("/doctors/my-profile/"),
+  createProfile: (body) => api("/doctors/create-profile/", { method: "POST", body }),
+  updateProfile: (body) => api("/doctors/update-profile/", { method: "PATCH", body }),
+  updateProfileFull: (body) => api("/doctors/update-profile/", { method: "PUT", body }),
+  getMySlots: () => api("/doctors/my-slots/"),
+  generateSlots: (body) => api("/doctors/generate-slots/", { method: "POST", body }),
+  deleteSlot: (id) => api(`/doctors/delete-slot/${id}/`, { method: "DELETE" }),
+  deleteSlotsByDate: (date) => api("/doctors/delete-slot/", { method: "DELETE", body: { date } }),
+  deleteAllSlots: () => api("/doctors/delete-all-slots/", { method: "DELETE" }),
+  listDoctors: () => api("/doctors/list/"),
+  getAvailableSlots: (doctorId, date) =>
+    api(`/doctors/${doctorId}/available-slots/?date=${date}`),
+};
 
-export async function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-}
+// ── Appointments ──────────────────────────────────────────────────────────
+export const appointmentApi = {
+  getDoctorAppointments: () => api("/appointments/doctor/appointments/"),
+  getDoctorToday: () => api("/appointments/doctor/today/"),
+  getUpcoming: () => api("/appointments/upcoming/"),
+  getMyAppointments: () => api("/appointments/my-appointments/"),
+  updateStatus: (id, status) =>
+    api(`/appointments/doctor/update-status/${id}/`, { method: "PATCH", body: { status } }),
+  book: (body) => api("/appointments/book/", { method: "POST", body }),
+  cancel: (id) => api(`/appointments/cancel/${id}/`, { method: "DELETE" }),
+};
+
+// ── Predictions ───────────────────────────────────────────────────────────
+export const predictionApi = {
+  predict: (body) => api("/predictions/predict/", { method: "POST", body }),
+  getHistory: () => api("/predictions/history/"),
+};

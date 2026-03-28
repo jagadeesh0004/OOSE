@@ -33,7 +33,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'user_type', 'phone_number', 'profile_pic']
+        fields = ['id', 'username', 'email', 'user_type', 'phone_number', 'profile_pic', 'first_name', 'last_name']
 
 class DoctorProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

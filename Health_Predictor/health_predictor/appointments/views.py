@@ -133,7 +133,7 @@ class CancelAppointmentView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     @transaction.atomic
-    def post(self, request, pk):
+    def delete(self, request, pk):
         try:
             appointment = Appointment.objects.get(id=pk)
         except Appointment.DoesNotExist:
@@ -182,13 +182,17 @@ class CancelAppointmentView(APIView):
             'message': 'Appointment cancelled successfully',
             'appointment': AppointmentSerializer(appointment).data
         })
+    
+    def post(self, request, pk):
+        # Delegate to delete method for backward compatibility
+        return self.delete(request, pk)
 
 
 class UpdateAppointmentStatusView(APIView):
     """Update appointment status (for doctors only)"""
     permission_classes = [permissions.IsAuthenticated]
     
-    def post(self, request, pk):
+    def patch(self, request, pk):
         # Check if user is doctor
         if request.user.user_type != 'doctor':
             return Response(
@@ -202,6 +206,13 @@ class UpdateAppointmentStatusView(APIView):
             return Response(
                 {'error': 'Appointment not found'},
                 status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Prevent any changes to cancelled appointments
+        if appointment.status == 'cancelled':
+            return Response(
+                {'error': 'Cannot update a cancelled appointment'},
+                status=status.HTTP_400_BAD_REQUEST
             )
         
         # Check if this appointment belongs to this doctor
@@ -235,6 +246,10 @@ class UpdateAppointmentStatusView(APIView):
             'message': f'Appointment status updated to {appointment.status}',
             'appointment': AppointmentSerializer(appointment).data
         })
+    
+    def post(self, request, pk):
+        # Delegate to patch method for backward compatibility
+        return self.patch(request, pk)
 
 
 class TodaysAppointmentsView(generics.ListAPIView):

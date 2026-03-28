@@ -11,7 +11,10 @@ import PatientDashboard from './pages/PatientDashboard.jsx';
 function App() {
   const [user, setUser] = useState(getStoredUser());
 
-  useEffect(() => subscribeToAuthChanges(setUser), []);
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthChanges(setUser);
+    return unsubscribe;
+  }, []);
 
   return (
     <BrowserRouter>
