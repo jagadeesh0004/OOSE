@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { format } from "date-fns";
 import { PageLoader } from "./PageLoader";
 import { Empty } from "./Empty";
 import { StatusBadge } from "./StatusBadge";
 import { Spinner } from "./Spinner";
 import { Field } from "./Field";
+import { DatePicker } from "./DatePicker";
 import { Ico } from "../utils/icons";
 import { IC, STATUS_OPTS } from "../utils/constants";
 import { appointmentApi } from "../services/api";
@@ -99,7 +101,10 @@ export function Appointments() {
       <div className="feature-card" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)", padding: 20 }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "flex-end" }}>
           <Field label="Filter by Date">
-            <input type="date" value={filters.date} onChange={(e) => setFilters((f) => ({ ...f, date: e.target.value }))} className="dash-input" style={{ width: 180 }} />
+            <DatePicker
+              value={filters.date ? new Date(filters.date) : null}
+              onChange={(date) => setFilters((f) => ({ ...f, date: date ? format(date, "yyyy-MM-dd") : "" }))}
+            />
           </Field>
           <Field label="Status">
             <CustomSelect

@@ -4,6 +4,7 @@ import { PageLoader } from "./PageLoader";
 import { Empty } from "./Empty";
 import { Spinner } from "./Spinner";
 import { Field } from "./Field";
+import { DatePicker } from "./DatePicker";
 import { Ico } from "../utils/icons";
 import { IC } from "../utils/constants";
 import { doctorApi, appointmentApi } from "../services/api";
@@ -98,7 +99,8 @@ export function BookAppointment({ onNav }) {
     if (!selDate || !selDoc) return;
     setLoadSlots(true);
     try {
-      const d = await doctorApi.getAvailableSlots(selDoc.id, selDate);
+      const dateStr = format(selDate, "yyyy-MM-dd");
+      const d = await doctorApi.getAvailableSlots(selDoc.id, dateStr);
       setSlots(Array.isArray(d) ? d : d?.results || []);
     } catch (err) {
       toast(err.message, "error");
@@ -237,31 +239,10 @@ export function BookAppointment({ onNav }) {
 
           <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)" }}>
             <Field label="Select Date">
-              <input
-                type="date"
-                value={selDate ? format(selDate, "yyyy-MM-dd") : ""}
-                min={format(new Date(), "yyyy-MM-dd")}
-                onChange={(e) => { 
-                  if (e.target.value) {
-                    const [year, month, day] = e.target.value.split("-");
-                    setSelDate(new Date(year, month - 1, day));
-                  }
-                  setSelSlot(null);
-                }}
-                className="dash-input"
-                style={{ 
-                  maxWidth: 220,
-                  appearance: "none", 
-                  background: "#f8fafc url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%230284c7\"><path d=\"M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z\"/></svg>')",
-                  backgroundRepeat: "no-repeat", 
-                  backgroundPosition: "right 12px center", 
-                  backgroundSize: "20px", 
-                  paddingRight: 40,
-                  fontSize: 14,
-                  fontFamily: "'DM Sans',sans-serif",
-                  color: "#0f172a",
-                  cursor: "pointer"
-                }}
+              <DatePicker 
+                value={selDate}
+                onChange={(date) => { setSelDate(date); setSelSlot(null); }}
+                minDate={new Date()}
               />
             </Field>
           </div>

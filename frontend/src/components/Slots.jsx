@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { format } from "date-fns";
 import { PageLoader } from "./PageLoader";
 import { Empty } from "./Empty";
 import { Spinner } from "./Spinner";
 import { Field, Inp, SLabel } from "./Field";
+import { DatePicker } from "./DatePicker";
 import { Ico } from "../utils/icons";
 import { IC, DAYS } from "../utils/constants";
 import { doctorApi } from "../services/api";
@@ -128,7 +130,10 @@ export function Slots() {
       <div className="feature-card" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)", padding: 20 }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "flex-end" }}>
           <Field label="Filter by Date">
-            <input type="date" value={filterDate} onChange={(e) => setFDate(e.target.value)} className="dash-input" style={{ width: 180 }} />
+            <DatePicker
+              value={filterDate ? new Date(filterDate) : null}
+              onChange={(date) => setFDate(date ? format(date, "yyyy-MM-dd") : "")}
+            />
           </Field>
           <Field label="Booking Status">
             <select value={filterBook} onChange={(e) => setFBook(e.target.value)} className="dash-input" style={{ width: 160 }}>
@@ -147,7 +152,10 @@ export function Slots() {
               </button>
             )}
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="date" value={delDate} onChange={(e) => setDelDate(e.target.value)} className="dash-input" style={{ width: 165 }} title="Delete slots by date" />
+              <DatePicker
+                value={delDate ? new Date(delDate) : null}
+                onChange={(date) => setDelDate(date ? format(date, "yyyy-MM-dd") : "")}
+              />
               <button className="cta-danger" onClick={deleteByDate} style={{ padding: "10px 14px" }}>
                 <Ico d={IC.trash} s={14} />
               </button>
@@ -172,8 +180,18 @@ export function Slots() {
             <p style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: 14, color: "#0ea5e9" }}>Auto-Generate Slots</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-            <Inp label="Start Date *" type="date" value={genForm.start_date} onChange={(e) => upG("start_date", e.target.value)} />
-            <Inp label="End Date *"   type="date" value={genForm.end_date}   onChange={(e) => upG("end_date", e.target.value)} />
+            <Field label="Start Date *">
+              <DatePicker
+                value={genForm.start_date ? new Date(genForm.start_date) : null}
+                onChange={(date) => upG("start_date", date ? format(date, "yyyy-MM-dd") : "")}
+              />
+            </Field>
+            <Field label="End Date *">
+              <DatePicker
+                value={genForm.end_date ? new Date(genForm.end_date) : null}
+                onChange={(date) => upG("end_date", date ? format(date, "yyyy-MM-dd") : "")}
+              />
+            </Field>
           </div>
           <Field label="Days to Generate">
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>

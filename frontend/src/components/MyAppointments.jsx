@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { format } from "date-fns";
 import { PageLoader } from "./PageLoader";
 import { Empty } from "./Empty";
 import { StatusBadge } from "./StatusBadge";
 import { Spinner } from "./Spinner";
 import { Field } from "./Field";
+import { DatePicker } from "./DatePicker";
 import { Ico } from "../utils/icons";
 import { IC } from "../utils/constants";
 import { appointmentApi } from "../services/api";
@@ -93,7 +95,10 @@ export function MyAppointments({ onNav }) {
             />
           </Field>
           <Field label="Filter by Date">
-            <input type="date" value={filterDate} onChange={(e) => setFD(e.target.value)} className="dash-input" style={{ width: 180 }} />
+            <DatePicker
+              value={filterDate ? new Date(filterDate) : null}
+              onChange={(date) => setFD(date ? format(date, "yyyy-MM-dd") : "")}
+            />
           </Field>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="cta-ghost" onClick={load} style={{ padding: "10px 14px" }}>
