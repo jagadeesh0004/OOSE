@@ -102,39 +102,56 @@ export function Prediction({ onNav }) {
           {/* Lifestyle */}
           <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#f43f5e,#e11d48)" }}>
             <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 20 }}>Lifestyle Factors</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <Field label="Smoking *">
-                <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-                  {["no", "yes"].map((v) => (
-                    <button key={v} type="button" onClick={() => up("smoking", v)} style={{
-                      flex: 1, padding: "10px 0", borderRadius: 10,
-                      border: `1.5px solid ${form.smoking === v ? "#0ea5e9" : "#e2e8f0"}`,
-                      background: form.smoking === v ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#fff",
-                      color: form.smoking === v ? "#fff" : "#64748b",
-                      fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: 13,
-                      cursor: "pointer", transition: "all 0.18s",
-                    }}>
-                      {v === "no" ? "🚭 No" : "🚬 Yes"}
-                    </button>
-                  ))}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+              {/* Smoking Toggle */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <label style={{
+                  fontFamily: "'Sora',sans-serif", fontSize: 11, fontWeight: 700, color: "#94a3b8",
+                  letterSpacing: "0.09em", textTransform: "uppercase", minWidth: 70, flexShrink: 0
+                }}>
+                  Smoking *
+                </label>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <button
+                    onClick={() => up("smoking", form.smoking === "yes" ? "no" : "yes")}
+                    className="toggle-track"
+                    style={{
+                      background: form.smoking === "yes" ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#e2e8f0",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <div className="toggle-knob" style={{ left: form.smoking === "yes" ? 24 : 4 }} />
+                  </button>
+                  <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: form.smoking === "yes" ? "#0284c7" : "#64748b" }}>
+                    {form.smoking === "yes" ? "Yes" : "No"}
+                  </span>
                 </div>
-              </Field>
-              <Field label="Alcohol *">
-                <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-                  {["no", "yes"].map((v) => (
-                    <button key={v} type="button" onClick={() => up("alcohol", v)} style={{
-                      flex: 1, padding: "10px 0", borderRadius: 10,
-                      border: `1.5px solid ${form.alcohol === v ? "#0ea5e9" : "#e2e8f0"}`,
-                      background: form.alcohol === v ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#fff",
-                      color: form.alcohol === v ? "#fff" : "#64748b",
-                      fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: 13,
-                      cursor: "pointer", transition: "all 0.18s",
-                    }}>
-                      {v === "no" ? "🚫 No" : "🍺 Yes"}
-                    </button>
-                  ))}
+              </div>
+
+              {/* Alcohol Toggle */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <label style={{
+                  fontFamily: "'Sora',sans-serif", fontSize: 11, fontWeight: 700, color: "#94a3b8",
+                  letterSpacing: "0.09em", textTransform: "uppercase", minWidth: 70, flexShrink: 0
+                }}>
+                  Alcohol *
+                </label>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <button
+                    onClick={() => up("alcohol", form.alcohol === "yes" ? "no" : "yes")}
+                    className="toggle-track"
+                    style={{
+                      background: form.alcohol === "yes" ? "linear-gradient(135deg,#0ea5e9,#0284c7)" : "#e2e8f0",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <div className="toggle-knob" style={{ left: form.alcohol === "yes" ? 24 : 4 }} />
+                  </button>
+                  <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: form.alcohol === "yes" ? "#0284c7" : "#64748b" }}>
+                    {form.alcohol === "yes" ? "Yes" : "No"}
+                  </span>
                 </div>
-              </Field>
+              </div>
             </div>
           </div>
 
@@ -184,15 +201,8 @@ export function Prediction({ onNav }) {
           {/* Prescription */}
           {result.prescription && (
             <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)" }}>
-              <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 14 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg,#e0f2fe,#bae6fd)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontSize: 18 }}>📋</span>
-                </div>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, fontWeight: 700, color: "#0f172a" }}>Personalised Prescription</h3>
-              </div>
-              <div style={{ background: "#f8fafc", borderRadius: 10, padding: "14px 18px", border: "1.5px solid #f1f5f9" }}>
-                <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.8 }}>{result.prescription}</p>
-              </div>
+              <p style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>Prescription</p>
+              <p style={{ fontSize: 14, color: "#0f172a", lineHeight: 1.8, whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{result.prescription}</p>
             </div>
           )}
 

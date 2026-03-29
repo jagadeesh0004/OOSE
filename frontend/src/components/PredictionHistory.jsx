@@ -176,9 +176,9 @@ export function PredictionHistory({ onNav }) {
                         ))}
                       </div>
                       {p.prescription && (
-                        <div style={{ background: "#fff", borderRadius: 10, padding: "12px 16px", border: "1.5px solid #f1f5f9", marginBottom: 16 }}>
-                          <p style={{ fontSize: 11.5, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Prescription</p>
-                          <p style={{ fontSize: 13.5, color: "#475569", lineHeight: 1.7 }}>{p.prescription}</p>
+                        <div style={{ marginBottom: 16 }}>
+                          <p style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Prescription</p>
+                          <p style={{ fontSize: 14, color: "#0f172a", lineHeight: 1.8, whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{p.prescription}</p>
                         </div>
                       )}
 

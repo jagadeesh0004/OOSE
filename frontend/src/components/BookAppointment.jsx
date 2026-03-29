@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { format } from "date-fns";
 import { PageLoader } from "./PageLoader";
 import { Empty } from "./Empty";
 import { Spinner } from "./Spinner";
@@ -47,7 +48,7 @@ export function BookAppointment({ onNav }) {
   const [selDoc,    setSelDoc]    = useState(null);
   const [slots,     setSlots]     = useState([]);
   const [selSlot,   setSelSlot]   = useState(null);
-  const [selDate,   setSelDate]   = useState("");
+  const [selDate,   setSelDate]   = useState(null);
   const [symptoms,  setSymptoms]  = useState("");
   const [step,      setStep]      = useState(1);
   const [loadDocs,  setLoadDocs]  = useState(true);
@@ -118,7 +119,7 @@ export function BookAppointment({ onNav }) {
     try {
       const res = await appointmentApi.book({
         doctor_id: selDoc.id,
-        date: selDate,
+        date: format(selDate, "yyyy-MM-dd"),
         slot_number: selSlot.slot_number,
         start_time: selSlot.start_time,
         symptoms,
@@ -238,11 +239,29 @@ export function BookAppointment({ onNav }) {
             <Field label="Select Date">
               <input
                 type="date"
-                value={selDate}
-                min={new Date().toISOString().split("T")[0]}
-                onChange={(e) => { setSelDate(e.target.value); setSelSlot(null); }}
+                value={selDate ? format(selDate, "yyyy-MM-dd") : ""}
+                min={format(new Date(), "yyyy-MM-dd")}
+                onChange={(e) => { 
+                  if (e.target.value) {
+                    const [year, month, day] = e.target.value.split("-");
+                    setSelDate(new Date(year, month - 1, day));
+                  }
+                  setSelSlot(null);
+                }}
                 className="dash-input"
-                style={{ maxWidth: 220, appearance: "none", background: "#fff", backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%230284c7\"><path d=\"M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z\"/></svg>')", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center", backgroundSize: "20px", paddingRight: 40, borderRadius: "12px", fontSize: 14, fontWeight: 600, fontFamily: "'Sora',sans-serif", color: "#0f172a", border: "1.5px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s ease", overflow: "hidden" }}
+                style={{ 
+                  maxWidth: 220,
+                  appearance: "none", 
+                  background: "#f8fafc url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%230284c7\"><path d=\"M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z\"/></svg>')",
+                  backgroundRepeat: "no-repeat", 
+                  backgroundPosition: "right 12px center", 
+                  backgroundSize: "20px", 
+                  paddingRight: 40,
+                  fontSize: 14,
+                  fontFamily: "'DM Sans',sans-serif",
+                  color: "#0f172a",
+                  cursor: "pointer"
+                }}
               />
             </Field>
           </div>
@@ -250,7 +269,7 @@ export function BookAppointment({ onNav }) {
           {selDate && (
             <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)" }}>
               <h4 style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>
-                Available Slots for {selDate}
+                Available Slots for {format(selDate, "MMM dd, yyyy")}
               </h4>
               {loadSlots
                 ? <div style={{ display: "flex", justifyContent: "center", padding: 24 }}><Spinner /></div>
@@ -305,7 +324,7 @@ export function BookAppointment({ onNav }) {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[
-                ["Date",   selDate],
+                ["Date",   format(selDate, "MMM dd, yyyy")],
                 ["Time",   `${selSlot.start_time?.slice(0, 5)} – ${selSlot.end_time?.slice(0, 5)}`],
                 ["Slot #", selSlot.slot_number],
                 ["Fee",    `₹${selDoc.consultation_fee}`],
@@ -353,13 +372,13 @@ export function BookAppointment({ onNav }) {
           <p style={{ fontSize: 14, color: "#64748b", marginBottom: 24, lineHeight: 1.7 }}>
             Your appointment is confirmed with{" "}
             <strong>{booked.doctor || selDoc?.user?.first_name}</strong> on{" "}
-            <strong>{booked.date || selDate}</strong> at{" "}
+            <strong>{booked.date || (selDate ? format(selDate, "MMM dd, yyyy") : "")}</strong> at{" "}
             <strong>{booked.start_time?.slice(0, 5) || selSlot?.start_time?.slice(0, 5)}</strong>.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <button
               className="cta-primary"
-              onClick={() => { setStep(1); setSelDoc(null); setSelSlot(null); setSelDate(""); setSymptoms(""); setBooked(null); }}
+              onClick={() => { setStep(1); setSelDoc(null); setSelSlot(null); setSelDate(null); setSymptoms(""); setBooked(null); }}
             >
               Book Another
             </button>
