@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from .models import HealthPrediction
 from .serializers import HealthPredictionInputSerializer, HealthPredictionSerializer
 from .utils import predict_health_risk, generate_prescription
-from doctors.models import DoctorProfile
+from doctors.models import DoctorProfile, TimeSlot
+from django.utils import timezone
+from datetime import date
 
 class HealthPredictionView(generics.GenericAPIView):
     """
@@ -34,12 +36,42 @@ class HealthPredictionView(generics.GenericAPIView):
             # Generate prescription
             prescription = generate_prescription(risk_level, data)
             
-            # # Find recommended doctor for high risk
-            recommended_doctor = None
+            # # Find all available active doctors with slots for high risk
+            available_doctors = []
             if risk_level == 'high':
-                recommended_doctor = DoctorProfile.objects.filter(
-                    is_available=True
-                ).first()
+                # Get all active and available doctors
+                doctors = DoctorProfile.objects.filter(
+                    is_available=True,
+                    user__is_active=True
+                ).select_related('user')
+                
+                # Filter doctors to only those with available slots (not booked)
+                today = date.today()
+                doctors_with_slots = []
+                
+                for doctor in doctors:
+                    # Check if doctor has at least one available slot (not booked, from today onwards)
+                    has_available_slot = TimeSlot.objects.filter(
+                        doctor=doctor,
+                        is_booked=False,
+                        date__gte=today
+                    ).exists()
+                    
+                    if has_available_slot:
+                        doctors_with_slots.append(doctor)
+                
+                # Build response with doctors who have slots
+                available_doctors = [
+                    {
+                        'id': doctor.id,
+                        'name': doctor.user.get_full_name() or doctor.user.username,
+                        'specialization': doctor.specialization,
+                        'hospital': doctor.hospital_name,
+                        'fee': str(doctor.consultation_fee),
+                        'experience': doctor.experience_years if hasattr(doctor, 'experience_years') else 'N/A'
+                    }
+                    for doctor in doctors_with_slots
+                ]
             
             # Save prediction to database
             health_prediction = HealthPrediction.objects.create(
@@ -67,15 +99,15 @@ class HealthPredictionView(generics.GenericAPIView):
                 'message': 'Health prediction completed successfully'
             }
             
-            # # Add doctor recommendation for high risk
-            if risk_level == 'high' and recommended_doctor:
-                response_data['recommended_doctor'] = {
-                    'id': recommended_doctor.id,
-                    'name': recommended_doctor.user.get_full_name() or recommended_doctor.user.username,
-                    'specialization': recommended_doctor.specialization,
-                    'hospital': recommended_doctor.hospital_name,
-                    'fee': str(recommended_doctor.consultation_fee)
-                }
+            # # Add doctor recommendations for high risk
+            if risk_level == 'high':
+                if available_doctors:
+                    response_data['available_doctors'] = available_doctors
+                    response_data['doctors_available'] = True
+                else:
+                    response_data['available_doctors'] = []
+                    response_data['doctors_available'] = False
+                    response_data['hospital_message'] = '🏥 No doctors with available slots at the moment. Please visit your nearest hospital for immediate medical attention.'
             
             # Return prediction response
             return Response(response_data, status=status.HTTP_201_CREATED)

@@ -27,7 +27,14 @@ export function PredictionHistory({ onNav }) {
       .finally(() => setLoading(false));
   }, []);
 
+  function bookWithDoctor(doctor) {
+    // Store just the doctor ID for BookAppointment to look up
+    sessionStorage.setItem("preSelectedDoctorId", doctor.id.toString());
+    onNav("book");
+  }
+
   const list = all.filter((p) => !filter || (p.risk_level || "").toLowerCase() === filter);
+  const isFirstPrediction = (prediction) => list.length > 0 && list[0].id === prediction.id;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }} className="fade-up">
@@ -169,10 +176,113 @@ export function PredictionHistory({ onNav }) {
                         ))}
                       </div>
                       {p.prescription && (
-                        <div style={{ background: "#fff", borderRadius: 10, padding: "12px 16px", border: "1.5px solid #f1f5f9" }}>
+                        <div style={{ background: "#fff", borderRadius: 10, padding: "12px 16px", border: "1.5px solid #f1f5f9", marginBottom: 16 }}>
                           <p style={{ fontSize: 11.5, color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Prescription</p>
                           <p style={{ fontSize: 13.5, color: "#475569", lineHeight: 1.7 }}>{p.prescription}</p>
                         </div>
+                      )}
+
+                      {/* Doctor recommendations for high risk - only for latest prediction */}
+                      {risk === "high" && isFirstPrediction(p) && (
+                        <>
+                          {p.doctors_available ? (
+                            <div style={{ background: "#f0f9ff", border: "1.5px solid #bae6fd", borderRadius: 10, padding: 14 }}>
+                              <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}>
+                                <span style={{ fontSize: 18 }}>🚨</span>
+                                <h4 style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#0284c7", margin: 0 }}>
+                                  Available Specialists ({p.available_doctors?.length || 0})
+                                </h4>
+                              </div>
+
+                              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 10 }}>
+                                {p.available_doctors?.map((doctor) => (
+                                  <div key={doctor.id} style={{
+                                    background: "#fff",
+                                    borderRadius: 10,
+                                    padding: "12px",
+                                    border: "1.5px solid #bae6fd",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 10,
+                                  }}>
+                                    {/* Doctor Header */}
+                                    <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                                      <div style={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: "50%",
+                                        background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        fontSize: 16,
+                                        fontWeight: 800,
+                                        color: "#fff",
+                                        fontFamily: "'Sora',sans-serif",
+                                        flexShrink: 0
+                                      }}>
+                                        {(doctor.name || "D")[0]?.toUpperCase() || "D"}
+                                      </div>
+                                      <div style={{ flex: 1 }}>
+                                        <p style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: 13, color: "#0f172a", lineHeight: 1.3, margin: 0 }}>
+                                          {doctor.name}
+                                        </p>
+                                        <p style={{ fontSize: 11, color: "#0ea5e9", fontWeight: 600, margin: "2px 0 0 0" }}>
+                                          {doctor.specialization}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Doctor Details */}
+                                    <div style={{ fontSize: 11.5, color: "#64748b", display: "flex", flexDirection: "column", gap: 3 }}>
+                                      <p style={{ margin: 0 }}>🏥 {doctor.hospital}</p>
+                                      <p style={{ margin: 0 }}>💰 ₹{doctor.fee}</p>
+                                    </div>
+
+                                    {/* Book Button */}
+                                    <button
+                                      onClick={() => bookWithDoctor(doctor)}
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px",
+                                        borderRadius: 6,
+                                        background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                                        color: "#fff",
+                                        border: "none",
+                                        fontFamily: "'Sora',sans-serif",
+                                        fontWeight: 700,
+                                        fontSize: 12,
+                                        cursor: "pointer",
+                                        transition: "all 0.2s",
+                                        marginTop: "auto"
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                                      onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+                                    >
+                                      📅 Book
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{
+                              background: "#f0f9ff",
+                              border: "1.5px solid #bae6fd",
+                              borderRadius: 10,
+                              textAlign: "center",
+                              padding: "20px 16px"
+                            }}>
+                              <div style={{ fontSize: 40, marginBottom: 10 }}>🏥</div>
+                              <h4 style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#0284c7", margin: "0 0 6px 0" }}>
+                                No Available Doctors
+                              </h4>
+                              <p style={{ fontSize: 12, color: "#64748b", lineHeight: 1.5, margin: 0 }}>
+                                {p.hospital_message || "No doctors are available for consultation at the moment. Please visit your nearest hospital."}
+                              </p>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   )}

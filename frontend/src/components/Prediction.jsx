@@ -5,6 +5,7 @@ import { Ico } from "../utils/icons";
 import { IC, RISK_GRAD } from "../utils/constants";
 import { predictionApi } from "../services/api";
 import { toast } from "./Toaster";
+import { CustomSelect } from "./CustomSelect";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Prediction — Health risk prediction form + result display
@@ -47,6 +48,12 @@ export function Prediction({ onNav }) {
     }
   }
 
+  function bookWithDoctor(doctor) {
+    // Store just the doctor ID for BookAppointment to look up
+    sessionStorage.setItem("preSelectedDoctorId", doctor.id.toString());
+    onNav("book");
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }} className="fade-up">
 
@@ -67,10 +74,14 @@ export function Prediction({ onNav }) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16 }}>
               <Inp label="Age (years) *" type="number" min="1" max="120" placeholder="35" value={form.age} onChange={(e) => up("age", e.target.value)} required />
               <Field label="Gender *">
-                <select value={form.gender} onChange={(e) => up("gender", e.target.value)} className="dash-input">
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
+                <CustomSelect
+                  value={form.gender}
+                  onChange={(v) => up("gender", v)}
+                  options={[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                  ]}
+                />
               </Field>
               <Inp label="Weight (kg) *" type="number" min="20" max="300" step="0.1" placeholder="70" value={form.weight} onChange={(e) => up("weight", e.target.value)} required />
               <Inp label="Height (cm) *" type="number" min="50" max="250" placeholder="170" value={form.height} onChange={(e) => up("height", e.target.value)} required />
@@ -186,23 +197,112 @@ export function Prediction({ onNav }) {
           )}
 
           {/* Recommended doctor */}
-          {result.recommended_doctor && (
-            <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#f43f5e,#e11d48)", border: "1.5px solid #fecdd3", background: "#fff1f2" }}>
-              <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 14 }}>
-                <span style={{ fontSize: 22 }}>🚨</span>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, fontWeight: 700, color: "#dc2626" }}>Immediate Consultation Recommended</h3>
-              </div>
-              <div style={{ background: "#fff", borderRadius: 10, padding: "14px 18px", border: "1.5px solid #fecdd3", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg,#0ea5e9,#0284c7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff", fontFamily: "'Sora',sans-serif" }}>
-                  {(result.recommended_doctor.name || "D")[3]?.toUpperCase() || "D"}
+          {result.risk_level?.toLowerCase() === 'high' && (
+            <>
+              {result.doctors_available ? (
+                <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)", border: "1.5px solid #bae6fd", background: "#f0f9ff" }}>
+                  <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 18 }}>
+                    <span style={{ fontSize: 22 }}>🚨</span>
+                    <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, fontWeight: 700, color: "#0284c7" }}>
+                      Available Specialists ({result.available_doctors?.length || 0})
+                    </h3>
+                  </div>
+
+                  {/* Doctors Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 }}>
+                    {result.available_doctors?.map((doctor) => (
+                      <div key={doctor.id} style={{
+                        background: "#fff",
+                        borderRadius: 12,
+                        padding: "16px",
+                        border: "1.5px solid #bae6fd",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 12,
+                        transition: "all 0.2s"
+                      }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 24px rgba(14,165,233,0.15)"} onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
+                        
+                        {/* Doctor Header */}
+                        <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                          <div style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: "50%",
+                            background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 18,
+                            fontWeight: 800,
+                            color: "#fff",
+                            fontFamily: "'Sora',sans-serif",
+                            flexShrink: 0
+                          }}>
+                            {(doctor.name || "D")[0]?.toUpperCase() || "D"}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: 13.5, color: "#0f172a", lineHeight: 1.4 }}>
+                              {doctor.name}
+                            </p>
+                            <p style={{ fontSize: 12, color: "#0ea5e9", fontWeight: 600, marginTop: 2 }}>
+                              {doctor.specialization}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Doctor Details */}
+                        <div style={{ fontSize: 12.5, color: "#64748b", display: "flex", flexDirection: "column", gap: 4 }}>
+                          <p>🏥 {doctor.hospital}</p>
+                          <p>💰 ₹{doctor.fee} per consultation</p>
+                          {doctor.experience && doctor.experience !== 'N/A' && (
+                            <p>📅 {doctor.experience} years experience</p>
+                          )}
+                        </div>
+
+                        {/* Book Button */}
+                        <button
+                          onClick={() => bookWithDoctor(doctor)}
+                          style={{
+                            width: "100%",
+                            padding: "10px",
+                            borderRadius: 8,
+                            background: "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                            color: "#fff",
+                            border: "none",
+                            fontFamily: "'Sora',sans-serif",
+                            fontWeight: 700,
+                            fontSize: 12.5,
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                            marginTop: "auto"
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                          onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+                        >
+                          📅 Book Appointment
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontFamily: "'Sora',sans-serif", fontWeight: 800, fontSize: 14.5, color: "#0f172a" }}>{result.recommended_doctor.name}</p>
-                  <p style={{ fontSize: 13, color: "#0ea5e9", fontWeight: 600 }}>{result.recommended_doctor.specialization}</p>
-                  <p style={{ fontSize: 12.5, color: "#64748b" }}>{result.recommended_doctor.hospital} · ₹{result.recommended_doctor.fee}</p>
+              ) : (
+                <div className="feature-card no-hover" style={{
+                  "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)",
+                  border: "1.5px solid #bae6fd",
+                  background: "#f0f9ff",
+                  textAlign: "center",
+                  padding: "32px 24px"
+                }}>
+                  <div style={{ fontSize: 48, marginBottom: 12 }}>🏥</div>
+                  <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: 16, fontWeight: 700, color: "#0284c7", marginBottom: 8 }}>
+                    No Available Doctors
+                  </h3>
+                  <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.6 }}>
+                    {result.hospital_message || "No doctors are available for consultation at the moment. Please visit your nearest hospital for immediate medical attention."}
+                  </p>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

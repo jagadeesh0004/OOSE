@@ -100,7 +100,7 @@ export function Appointments() {
             <input type="date" value={filters.date} onChange={(e) => setFilters((f) => ({ ...f, date: e.target.value }))} className="dash-input" style={{ width: 180 }} />
           </Field>
           <Field label="Status">
-            <select value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))} className="dash-input" style={{ width: 160 }}>
+            <select value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))} className="dash-input" style={{ width: 160, appearance: "none", background: "#fff", backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%230284c7\"><path d=\"M7 10l5 5 5-5z\"/></svg>')", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center", backgroundSize: "18px", paddingRight: 40, borderRadius: "12px", fontSize: 14, fontWeight: 600, fontFamily: "'Sora',sans-serif", color: "#0f172a", border: "1.5px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s ease", overflow: "hidden" }}>
               <option value="">All Statuses</option>
               {STATUS_OPTS.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
@@ -197,12 +197,10 @@ export function Appointments() {
                       disabled={updating === a.id || a.status?.toLowerCase() === "cancelled"}
                       className="dash-input"
                       style={{
-                        width: 154, fontSize: 13,
-                        fontFamily: "'Sora',sans-serif", fontWeight: 600,
-                        paddingRight: 30,
+                        width: 154, fontSize: 13, fontFamily: "'Sora',sans-serif", fontWeight: 600,
+                        appearance: "none", background: "#fff", backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%230284c7\"><path d=\"M7 10l5 5 5-5z\"/></svg>')", backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center", backgroundSize: "16px", paddingRight: 36, borderRadius: "12px", color: "#0f172a", border: "1.5px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", cursor: updating === a.id || a.status?.toLowerCase() === "cancelled" ? "not-allowed" : "pointer",
                         opacity: updating === a.id || a.status?.toLowerCase() === "cancelled" ? 0.6 : 1,
-                        cursor: updating === a.id || a.status?.toLowerCase() === "cancelled" ? "not-allowed" : "pointer",
-                        background: "linear-gradient(135deg,#f8fafc,#f1f5f9)",
+                        transition: "all 0.2s ease", overflow: "hidden"
                       }}
                     >
                       {STATUS_OPTS.map((s) => <option key={s} value={s.toLowerCase()}>{s}</option>)}

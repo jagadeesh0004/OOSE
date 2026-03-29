@@ -8,6 +8,7 @@ import { Ico } from "../utils/icons";
 import { IC, STATUS_OPTS } from "../utils/constants";
 import { appointmentApi } from "../services/api";
 import { toast } from "./Toaster";
+import { CustomSelect } from "./CustomSelect";
 
 const BLANK_FILTERS = { date: "", status: "", search: "" };
 
@@ -101,10 +102,15 @@ export function Appointments() {
             <input type="date" value={filters.date} onChange={(e) => setFilters((f) => ({ ...f, date: e.target.value }))} className="dash-input" style={{ width: 180 }} />
           </Field>
           <Field label="Status">
-            <select value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))} className="dash-input" style={{ width: 160 }}>
-              <option value="">All Statuses</option>
-              {STATUS_OPTS.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
+            <CustomSelect
+              value={filters.status}
+              onChange={(v) => setFilters((f) => ({ ...f, status: v }))}
+              options={[
+                { value: "", label: "All Statuses" },
+                ...STATUS_OPTS.map((s) => ({ value: s, label: s })),
+              ]}
+              style={{ width: 160 }}
+            />
           </Field>
           <Field label="Search Patient">
             <div style={{ position: "relative" }}>
@@ -191,23 +197,13 @@ export function Appointments() {
                   <StatusBadge status={a.status || "pending"} />
 
                   {/* Status dropdown */}
-                  <div style={{ position: "relative", flexShrink: 0 }}>
-                    <select
+                  <div style={{ position: "relative", flexShrink: 0, width: 154 }}>
+                    <CustomSelect
                       value={a.status?.toLowerCase() || "pending"}
-                      onChange={(e) => changeStatus(a.id, e.target.value)}
-                      disabled={updating === a.id || a.status?.toLowerCase() === "cancelled"}
-                      className="dash-input"
-                      style={{
-                        width: 154, fontSize: 13,
-                        fontFamily: "'Sora',sans-serif", fontWeight: 600,
-                        paddingRight: 30,
-                        opacity: updating === a.id || a.status?.toLowerCase() === "cancelled" ? 0.6 : 1,
-                        cursor: updating === a.id || a.status?.toLowerCase() === "cancelled" ? "not-allowed" : "pointer",
-                        background: "linear-gradient(135deg,#f8fafc,#f1f5f9)",
-                      }}
-                    >
-                      {STATUS_OPTS.map((s) => <option key={s} value={s.toLowerCase()}>{s}</option>)}
-                    </select>
+                      onChange={(v) => changeStatus(a.id, v)}
+                      options={STATUS_OPTS.map((s) => ({ value: s.toLowerCase(), label: s }))}
+                      style={{ width: 154, pointerEvents: updating === a.id || a.status?.toLowerCase() === "cancelled" ? "none" : "auto", opacity: updating === a.id || a.status?.toLowerCase() === "cancelled" ? 0.6 : 1 }}
+                    />
                     {updating === a.id && (
                       <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)" }}>
                         <Spinner size={14} />

@@ -58,7 +58,29 @@ export function BookAppointment({ onNav }) {
 
   useEffect(() => {
     doctorApi.listDoctors()
-      .then((d) => setDoctors(Array.isArray(d) ? d : d?.results || []))
+      .then((d) => {
+        const docList = Array.isArray(d) ? d : d?.results || [];
+        setDoctors(docList);
+
+        // Check for pre-selected doctor from prediction result
+        const preSelectedId = sessionStorage.getItem("preSelectedDoctorId");
+        if (preSelectedId) {
+          const preSelectedDoc = docList.find((doc) => doc.id === parseInt(preSelectedId));
+          if (preSelectedDoc) {
+            setSelDoc(preSelectedDoc);
+            // Set default date to tomorrow (local timezone)
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const date = String(tomorrow.getDate()).padStart(2, '0');
+            const tomorrowStr = `${year}-${month}-${date}`;
+            setSelDate(tomorrowStr);
+            setStep(2);
+            sessionStorage.removeItem("preSelectedDoctorId");
+          }
+        }
+      })
       .catch(() => {})
       .finally(() => setLoadDocs(false));
   }, []);
@@ -220,7 +242,7 @@ export function BookAppointment({ onNav }) {
                 min={new Date().toISOString().split("T")[0]}
                 onChange={(e) => { setSelDate(e.target.value); setSelSlot(null); }}
                 className="dash-input"
-                style={{ maxWidth: 220 }}
+                style={{ maxWidth: 220, appearance: "none", background: "#fff", backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"%230284c7\"><path d=\"M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z\"/></svg>')", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center", backgroundSize: "20px", paddingRight: 40, borderRadius: "12px", fontSize: 14, fontWeight: 600, fontFamily: "'Sora',sans-serif", color: "#0f172a", border: "1.5px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", cursor: "pointer", transition: "all 0.2s ease", overflow: "hidden" }}
               />
             </Field>
           </div>

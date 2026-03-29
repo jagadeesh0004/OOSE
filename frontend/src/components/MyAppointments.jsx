@@ -8,6 +8,7 @@ import { Ico } from "../utils/icons";
 import { IC } from "../utils/constants";
 import { appointmentApi } from "../services/api";
 import { toast } from "./Toaster";
+import { CustomSelect } from "./CustomSelect";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MyAppointments — Patient appointments list page
@@ -78,13 +79,18 @@ export function MyAppointments({ onNav }) {
       <div className="feature-card no-hover" style={{ padding: 20, "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "flex-end" }}>
           <Field label="Filter by Status">
-            <select value={filterStatus} onChange={(e) => setFS(e.target.value)} className="dash-input" style={{ width: 170 }}>
-              <option value="">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+            <CustomSelect
+              value={filterStatus}
+              onChange={(v) => setFS(v)}
+              options={[
+                { value: "", label: "All Statuses" },
+                { value: "pending", label: "Pending" },
+                { value: "confirmed", label: "Confirmed" },
+                { value: "completed", label: "Completed" },
+                { value: "cancelled", label: "Cancelled" },
+              ]}
+              style={{ width: 170 }}
+            />
           </Field>
           <Field label="Filter by Date">
             <input type="date" value={filterDate} onChange={(e) => setFD(e.target.value)} className="dash-input" style={{ width: 180 }} />
