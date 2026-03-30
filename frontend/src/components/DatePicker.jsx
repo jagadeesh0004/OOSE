@@ -18,7 +18,21 @@ import { IC } from "../utils/constants";
 
 export function DatePicker({ value, onChange, minDate }) {
   const [showCalendar, setShowCalendar] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(value ? new Date(value.getFullYear(), value.getMonth(), 1) : new Date());
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    if (!value) return new Date();
+    // Handle both Date objects and strings, avoiding timezone issues
+    let dateObj;
+    if (value instanceof Date) {
+      dateObj = value;
+    } else if (typeof value === 'string') {
+      // Parse string like "2026-03-31" in local timezone
+      const [year, month, day] = value.split('-');
+      dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else {
+      return new Date();
+    }
+    return new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
+  });
   const [buttonRect, setButtonRect] = useState(null);
   const buttonRef = useRef(null);
 
@@ -74,7 +88,18 @@ export function DatePicker({ value, onChange, minDate }) {
         onMouseEnter={(e) => e.currentTarget.style.borderColor = "#0ea5e9"}
         onMouseLeave={(e) => e.currentTarget.style.borderColor = "#e2e8f0"}
       >
-        <span style={{ flex: 1 }}>{value ? format(value, "MMM dd, yyyy") : "Select date"}</span>
+        <span style={{ flex: 1 }}>
+          {value ? (() => {
+            let displayDate;
+            if (value instanceof Date) {
+              displayDate = value;
+            } else if (typeof value === 'string') {
+              const [year, month, day] = value.split('-');
+              displayDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            }
+            return displayDate ? format(displayDate, "MMM dd, yyyy") : "Select date";
+          })() : "Select date"}
+        </span>
         <Ico d={IC.calendar} s={16} color="#0284c7" stroke={1.5} style={{ flexShrink: 0 }} />
       </button>
 
@@ -201,7 +226,16 @@ export function DatePicker({ value, onChange, minDate }) {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 0 }}>
                 {days.map((day) => {
                   const isCurrentMonth = isSameMonth(day, currentMonth);
-                  const isSelected = value && isSameDay(day, value);
+                  const isSelected = value && (() => {
+                    let compareDate;
+                    if (value instanceof Date) {
+                      compareDate = value;
+                    } else if (typeof value === 'string') {
+                      const [year, month, dayStr] = value.split('-');
+                      compareDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(dayStr));
+                    }
+                    return compareDate && isSameDay(day, compareDate);
+                  })();
                   const isDisabled = minDate && day < minDate;
                   const isToday = isSameDay(day, new Date());
 

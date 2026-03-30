@@ -99,7 +99,10 @@ export function BookAppointment({ onNav }) {
     if (!selDate || !selDoc) return;
     setLoadSlots(true);
     try {
-      const dateStr = format(selDate, "yyyy-MM-dd");
+      // Parse date string to avoid timezone issues
+      const [year, month, day] = selDate.split('-');
+      const dateObj = new Date(year, month - 1, day);
+      const dateStr = format(dateObj, "yyyy-MM-dd");
       const d = await doctorApi.getAvailableSlots(selDoc.id, dateStr);
       setSlots(Array.isArray(d) ? d : d?.results || []);
     } catch (err) {
@@ -119,9 +122,13 @@ export function BookAppointment({ onNav }) {
     }
     setBooking(true);
     try {
+      // Parse date string to avoid timezone issues
+      const [year, month, day] = selDate.split('-');
+      const dateObj = new Date(year, month - 1, day);
+      
       const res = await appointmentApi.book({
         doctor_id: selDoc.id,
-        date: format(selDate, "yyyy-MM-dd"),
+        date: format(dateObj, "yyyy-MM-dd"),
         slot_number: selSlot.slot_number,
         start_time: selSlot.start_time,
         symptoms,
@@ -240,8 +247,14 @@ export function BookAppointment({ onNav }) {
           <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)" }}>
             <Field label="Select Date">
               <DatePicker 
-                value={selDate}
-                onChange={(date) => { setSelDate(date); setSelSlot(null); }}
+                value={selDate ? new Date(selDate) : null}
+                onChange={(date) => { 
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const day = String(date.getDate()).padStart(2, '0');
+                  setSelDate(`${year}-${month}-${day}`);
+                  setSelSlot(null);
+                }}
                 minDate={new Date()}
               />
             </Field>
@@ -250,7 +263,10 @@ export function BookAppointment({ onNav }) {
           {selDate && (
             <div className="feature-card no-hover" style={{ "--accent": "linear-gradient(135deg,#0ea5e9,#0284c7)" }}>
               <h4 style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>
-                Available Slots for {format(selDate, "MMM dd, yyyy")}
+                Available Slots for {(() => {
+                  const [year, month, day] = selDate.split('-');
+                  return format(new Date(parseInt(year), parseInt(month) - 1, parseInt(day)), "MMM dd, yyyy");
+                })()}
               </h4>
               {loadSlots
                 ? <div style={{ display: "flex", justifyContent: "center", padding: 24 }}><Spinner /></div>
@@ -305,7 +321,10 @@ export function BookAppointment({ onNav }) {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[
-                ["Date",   format(selDate, "MMM dd, yyyy")],
+                ["Date",   (() => {
+                  const [year, month, day] = selDate.split('-');
+                  return format(new Date(parseInt(year), parseInt(month) - 1, parseInt(day)), "MMM dd, yyyy");
+                })()],
                 ["Time",   `${selSlot.start_time?.slice(0, 5)} – ${selSlot.end_time?.slice(0, 5)}`],
                 ["Slot #", selSlot.slot_number],
                 ["Fee",    `₹${selDoc.consultation_fee}`],

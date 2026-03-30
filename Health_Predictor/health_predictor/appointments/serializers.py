@@ -61,9 +61,22 @@ class BookAppointmentSerializer(serializers.Serializer):
                 is_booked=False
             )
         except TimeSlot.DoesNotExist:
-            raise serializers.ValidationError(
-                f"Slot at {start_time} on {appointment_date} is not available for this doctor"
-            )
+            # Check if slot exists but is already booked
+            booked_slot = TimeSlot.objects.filter(
+                doctor=doctor,
+                date=appointment_date,
+                start_time=start_time,
+                is_booked=True
+            ).exists()
+            
+            if booked_slot:
+                raise serializers.ValidationError(
+                    f"This slot at {start_time.strftime('%H:%M')} on {appointment_date} has been booked. Please select another time."
+                )
+            else:
+                raise serializers.ValidationError(
+                    f"Slot at {start_time.strftime('%H:%M')} on {appointment_date} is not available for this doctor"
+                )
         
         # Check if slot is for today but time has passed
         if appointment_date == date.today() and start_time < datetime.now().time():
