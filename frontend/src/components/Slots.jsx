@@ -5,6 +5,7 @@ import { Empty } from "./Empty";
 import { Spinner } from "./Spinner";
 import { Field, Inp, SLabel } from "./Field";
 import { DatePicker } from "./DatePicker";
+import { CustomSelect } from "./CustomSelect";
 import { Ico } from "../utils/icons";
 import { IC, DAYS } from "../utils/constants";
 import { doctorApi } from "../services/api";
@@ -136,11 +137,16 @@ export function Slots() {
             />
           </Field>
           <Field label="Booking Status">
-            <select value={filterBook} onChange={(e) => setFBook(e.target.value)} className="dash-input" style={{ width: 160 }}>
-              <option value="all">All Slots</option>
-              <option value="booked">Booked</option>
-              <option value="unbooked">Available</option>
-            </select>
+            <CustomSelect
+              value={filterBook}
+              onChange={(v) => setFBook(v)}
+              options={[
+                { value: "all", label: "All Slots" },
+                { value: "booked", label: "Booked" },
+                { value: "unbooked", label: "Available" },
+              ]}
+              style={{ width: "100%" }}
+            />
           </Field>
           <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
             <button className="cta-ghost" onClick={load} style={{ padding: "10px 16px" }}>

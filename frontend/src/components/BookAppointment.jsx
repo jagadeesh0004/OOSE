@@ -277,8 +277,15 @@ export function BookAppointment({ onNav }) {
                     {slots.map((sl) => (
                       <button
                         key={sl.id}
-                        onClick={() => sl.is_booked ? null : setSelSlot(sl)}
+                        onClick={() => {
+                          if (sl.is_booked) {
+                            toast("Already booked", "error");
+                          } else {
+                            setSelSlot(sl);
+                          }
+                        }}
                         className={`slot-chip ${sl.is_booked ? "taken" : ""} ${selSlot?.id === sl.id ? "selected" : ""}`}
+                        disabled={sl.is_booked}
                       >
                         <div style={{ fontWeight: 700, fontSize: 13.5 }}>{sl.start_time?.slice(0, 5)}</div>
                         <div style={{ fontSize: 11, marginTop: 2, opacity: 0.75 }}>Slot #{sl.slot_number}</div>

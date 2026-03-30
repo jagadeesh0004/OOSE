@@ -202,18 +202,21 @@ export function Appointments() {
                   <StatusBadge status={a.status || "pending"} />
 
                   {/* Status dropdown */}
-                  <div style={{ position: "relative", flexShrink: 0, width: 154 }}>
-                    <CustomSelect
-                      value={a.status?.toLowerCase() || "pending"}
-                      onChange={(v) => changeStatus(a.id, v)}
-                      options={STATUS_OPTS.map((s) => ({ value: s.toLowerCase(), label: s }))}
-                      style={{ width: 154, pointerEvents: updating === a.id || a.status?.toLowerCase() === "cancelled" ? "none" : "auto", opacity: updating === a.id || a.status?.toLowerCase() === "cancelled" ? 0.6 : 1 }}
-                    />
-                    {updating === a.id && (
-                      <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)" }}>
-                        <Spinner size={14} />
-                      </div>
-                    )}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0, width: 154 }}>
+                    <label style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.09em", fontFamily: "'Sora',sans-serif" }}>Status</label>
+                    <div style={{ position: "relative", width: "100%" }}>
+                      <CustomSelect
+                        value={a.status?.toLowerCase() || "pending"}
+                        onChange={(v) => changeStatus(a.id, v)}
+                        options={STATUS_OPTS.map((s) => ({ value: s.toLowerCase(), label: s }))}
+                        style={{ width: "100%", pointerEvents: updating === a.id || a.status?.toLowerCase() === "cancelled" ? "none" : "auto", opacity: updating === a.id || a.status?.toLowerCase() === "cancelled" ? 0.6 : 1 }}
+                      />
+                      {updating === a.id && (
+                        <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)" }}>
+                          <Spinner size={14} />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

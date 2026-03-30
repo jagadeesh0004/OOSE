@@ -7,15 +7,19 @@ export function CustomSelect({ value, onChange, options, placeholder = "Select..
   const containerRef = useRef(null);
   const buttonRef = useRef(null);
 
-  useEffect(() => {
+  const updatePosition = () => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setPosition({
-        top: rect.bottom + window.scrollY + 6,
-        left: rect.left + window.scrollX,
+        top: rect.bottom + 6,
+        left: rect.left,
         width: rect.width,
       });
     }
+  };
+
+  useEffect(() => {
+    updatePosition();
   }, [isOpen]);
 
   useEffect(() => {
@@ -24,8 +28,17 @@ export function CustomSelect({ value, onChange, options, placeholder = "Select..
         setIsOpen(false);
       }
     }
-    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    function handleScroll() {
+      updatePosition();
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      window.addEventListener("scroll", handleScroll, true);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
   }, [isOpen]);
 
   const selectedOption = options.find((opt) => opt.value === value);

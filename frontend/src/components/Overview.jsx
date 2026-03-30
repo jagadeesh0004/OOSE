@@ -218,14 +218,14 @@ export function Overview({ doctor, user, onNav }) {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontFamily: "'Sora',sans-serif", fontWeight: 800, fontSize: 14, color: "#0ea5e9",
                   }}>
-                    {(String(a.patient_name || a.patient || "P"))[0].toUpperCase()}
+                    {(String(a.patient_details?.first_name || a.patient_details?.username || a.patient_name || a.patient || "P"))[0].toUpperCase()}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
-                      {a.patient_name || a.patient || "Patient"}
+                      {a.patient_details?.first_name || a.patient_details?.username || a.patient_name || a.patient || "Patient"}
                     </p>
                     <p style={{ fontSize: 12.5, color: "#94a3b8", fontFamily: "'DM Sans',sans-serif", marginTop: 2 }}>
-                      🕐 {a.slot_start_time || a.time || "—"}
+                      🕐 {a.slot_start_time && a.slot_end_time ? `${a.slot_start_time} – ${a.slot_end_time}` : (a.appointment_time || a.time || "—")}
                     </p>
                   </div>
                   <StatusBadge status={a.status || "pending"} />
